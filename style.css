@@ -1,3 +1,29 @@
-th {
-  padding: 15px;
+
+td, th {
+  padding: 5px;
+  text-align: left;
+  height: 2rem;
 }
+th {
+  background-color: #00ff00;
+}
+table {
+  border-spacing: 0px;
+   border-collapse: collapse;
+}
+body {
+  background-color: white;
+  padding: 10px;
+  margin: 15px;
+}
+
+
+td:nth-child(1) {
+  background-color: #00ff00;
+ }
+ td:nth-child(2) {
+   background-color: #00ff00;
+  }
+ tr:nth-child(even) {
+   background-color: #fff7e6;
+ }
