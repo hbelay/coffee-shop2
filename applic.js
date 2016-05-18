@@ -15,10 +15,12 @@ function CampfireCoffee (locationName, minCustomersHour, maxCustomersHour, avgCu
   this.beansNeededForCupsPerHour = [];
   this.poundPackagesPerHour = [];
   this.beansPerHour = [];
+  this.baristaPerHour = [];
   this.dailyCustomersTotal = 0;
   this.dailyCupsTotal = 0;
   this.dailyPoundPackagesTotal = 0;
   this.dailyBeansNeeded = 0;
+
   shopCenters.push(this);
 };
 //generating metoods
@@ -57,15 +59,18 @@ CampfireCoffee.prototype.calcBeansPerHour = function(){
     this.dailyBeansNeeded += beans;
   }
 };
-
+CampfireCoffee.prototype.calcBaristaPerHour = function(){
+  for(var i = 0; i < hours.length; i ++){
+    var barista = Math.ceil(parseFloat(((this.cupsPerHour[i] * 2 + this.beansPerHour[i] * 2)) / 60).toFixed(1));//hrly total
+    this.baristaPerHour.push(barista);
+  }
+};
 CampfireCoffee.prototype.render = function() {
   this.calcCustomersPerHour(this.minCustomersHour, this.maxCustomersHour);
   this.calCupsPerHour();
   this.calBeansNeededForCupsPerHour();
   this.calPoundPackagesPerHour();
   this.calcBeansPerHour();
-  // call all of the other methods that calc data
-
   this.makeRows();
 };
 // making table 1
@@ -100,23 +105,51 @@ CampfireCoffee.prototype.makeRows = function() {
 
   for(var i = 0; i < hours.length; i++){
     var tdElement = document.createElement('td');
-    tdElement.textContent = this.beansPerHour[i];//hrly total
+    tdElement.textContent = this.beansPerHour[i];
     trElement.appendChild(tdElement);
   }
   shopTable.appendChild(trElement);
 };
 
-makeTableHeader();
+function makeTotalsRow(){
+  var trElement = document.createElement('tr');
+  var tdElement = document.createElement('td');
+  tdElement.textContent = 'Total';
+  trElement.appendChild(tdElement);
+
+  var grandTotal = 0;
+  for(var i = 0; i < shopCenters.length; i++ ){
+    var grandSumTotal = Math.round(shopCenters[i].dailyBeansNeeded);
+    grandTotal += grandSumTotal;
+  }
+  var tdElement = document.createElement('td');
+  tdElement.textContent = grandTotal;
+  trElement.appendChild(tdElement);
+
+  var dTotal = 0;
+  for(var i = 0; i < hours.length; i++){
+    for(var j = 0; j < shopCenters.length; j++ ){
+      dTotal += Math.round(shopCenters[j].beansPerHour[i]);
+    }
+    var tdElement = document.createElement('td');
+    tdElement.textContent = dTotal;
+    trElement.appendChild(tdElement);
+  }
+  shopTable.appendChild(trElement);
+}
 var pike = new CampfireCoffee('Pike Market Place ', 14, 35, 1.2, 0.34);
-pike.render();
 var capitol = new CampfireCoffee('Capitol Hill ', 12,	28,	3.2, 0.03);
-capitol.render();
 var spl = new CampfireCoffee('Seattle Public Library ',9,	45,	2.6	,0.02);
-spl.render();
 var southlake = new CampfireCoffee('South Lake Union ',5,	18,	1.3,	0.04);
-southlake.render();
 var seatac = new CampfireCoffee('Sea-Tac Air Port', 28,	44,	1.1,	0.41);
+
+makeTableHeader();
+pike.render();
+capitol.render();
+spl.render();
+southlake.render();
 seatac.render();
+makeTotalsRow();
 
 //Making table 2
 CampfireCoffee.prototype.render2 = function() {
@@ -125,7 +158,7 @@ CampfireCoffee.prototype.render2 = function() {
   this.calBeansNeededForCupsPerHour();
   this.calPoundPackagesPerHour();
   this.calcBeansPerHour();
-  // call all of the other methods that calc data
+  this.calcBaristaPerHour();
   this.makeBaristaRows();
 };
 
@@ -153,25 +186,56 @@ CampfireCoffee.prototype.makeBaristaRows = function() {
   trElement.appendChild(tdElement);
 
   var tdElement = document.createElement('td');
-  tdElement.textContent = (parseFloat(this.dailyCupsTotal * 2) + parseFloat(this.dailyBeansNeeded * 2)).toFixed(1) ; //Daily-Total
+  tdElement.textContent = Math.ceil(((parseFloat(this.dailyCupsTotal * 2) + parseFloat(this.dailyBeansNeeded * 2)) / 60).toFixed(1)) ; //Daily-Total
   console.log(this);
   trElement.appendChild(tdElement);
 
   for(var i = 0; i < hours.length; i++){
     var tdElement = document.createElement('td');
-    tdElement.textContent = parseFloat(this.cupsPerHour[i] * 2 + this.beansPerHour[i] * 2).toFixed(1);//hrly total
+    tdElement.textContent = Math.ceil(parseFloat(((this.cupsPerHour[i] * 2 + this.beansPerHour[i] * 2)) / 60).toFixed(1));//hrly total
     trElement.appendChild(tdElement);
   }
   baristaTable.appendChild(trElement);
 };
-makeBaristaTableHeader();
+
+// /====================
+function makeBaristaTotalsRow(){
+  var trElement = document.createElement('tr');
+  var tdElement = document.createElement('td');
+  tdElement.textContent = 'Total';
+  trElement.appendChild(tdElement);
+
+  var grandTotal = 0;
+  for(var i = 0; i < shopCenters.length; i++ ){
+    var grandSumTotal = Math.round((shopCenters[i].dailyCupsTotal + shopCenters[i].dailyBeansNeeded) / 60);
+    grandTotal += grandSumTotal;
+  }
+  var tdElement = document.createElement('td');
+  tdElement.textContent = grandTotal;
+  trElement.appendChild(tdElement);
+
+  var dTotal = 0;
+  for(var i = 0; i < hours.length; i++){
+    for(var j = 0; j < shopCenters.length; j++ ){
+      dTotal += Math.round(shopCenters[j].beansPerHour[i]);
+    }
+    var tdElement = document.createElement('td');
+    tdElement.textContent = dTotal;
+    trElement.appendChild(tdElement);
+  }
+  baristaTable.appendChild(trElement);
+}
+//=================
 var pike = new CampfireCoffee('Pike Market Place ', 14, 35, 1.2, 0.34);
-pike.render2();
 var capitol = new CampfireCoffee('Capitol Hill ', 12,	28,	3.2, 0.03);
-capitol.render2();
 var spl = new CampfireCoffee('Seattle Public Library ',9,	45,	2.6	,0.02);
-spl.render2();
 var southlake = new CampfireCoffee('South Lake Union ',5,	18,	1.3,	0.04);
-southlake.render2();
 var seatac = new CampfireCoffee('Sea-Tac Air Port', 28,	44,	1.1,	0.41);
+
+makeBaristaTableHeader();
+pike.render2();
+capitol.render2();
+spl.render2();
+southlake.render2();
 seatac.render2();
+makeBaristaTotalsRow();
